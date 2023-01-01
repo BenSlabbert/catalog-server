@@ -1,4 +1,6 @@
-create table item (
-    id serial,
-    name text
-);
+CREATE
+	TABLE
+		item(
+			id serial,
+			name text
+		);
