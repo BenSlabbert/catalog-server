@@ -6,6 +6,7 @@ import com.fluent.catalog.mapper.ItemMapper;
 import com.fluent.catalog.web.dto.CreateItemDto;
 import com.fluent.catalog.web.dto.ItemDto;
 import com.fluent.catalog.web.dto.UpdateItemDto;
+import com.fluent.catalog.web.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,7 @@ public class ItemService {
   public Mono<ItemDto> update(Long id, UpdateItemDto updateItemDto) {
     return itemRepo
         .update(id, updateItemDto.name())
-        .switchIfEmpty(Mono.error(new IllegalArgumentException("no item found for id: " + id)))
+        .switchIfEmpty(Mono.error(new NotFoundException("no item found for id: " + id)))
         .map(ITEM_MAPPER::toDto);
   }
 }

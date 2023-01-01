@@ -1,4 +1,4 @@
-package com.fluent.catalog.web;
+package com.fluent.catalog.web.controller;
 
 import com.fluent.catalog.service.ItemService;
 import com.fluent.catalog.web.dto.CreateItemDto;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/item")
 @RequiredArgsConstructor
-public class Crud {
+public class ItemController {
 
   private final ItemService itemService;
 
