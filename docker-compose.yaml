@@ -9,3 +9,12 @@ services:
       POSTGRES_DB: catalog
     ports:
       - "5432:5432"
+
+  catalog:
+      image: catalog:latest
+      environment:
+        APP_DB_HOST: "postgres:5432"
+      ports:
+        - "8080:8080"
+      depends_on:
+        - postgres

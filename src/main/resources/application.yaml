@@ -1,13 +1,18 @@
+app:
+  db:
+    host: "localhost:5432"
 spring:
+  jpa:
+    open-in-view: false
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/catalog
-    password: postgres
-    username: postgres
+    url: "r2dbc:postgresql://${app.db.host}/catalog"
+    password: "postgres"
+    username: "postgres"
   flyway:
     enabled: true
-    url: jdbc:postgresql://localhost:5432/catalog
-    password: postgres
-    user: postgres
+    url: "jdbc:postgresql://${app.db.host}/catalog"
+    password: "postgres"
+    user: "postgres"
     locations:
-      - classpath:db/migration
+      - "classpath:db/migration"
     validate-migration-naming: true

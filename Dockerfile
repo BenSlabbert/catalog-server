@@ -28,3 +28,5 @@ COPY target/lib lib
 ENV JAVA_OPTS="-Xmx32M -Xms32M"
 
 CMD /opt/java/bin/java -jar app.jar "$JAVA_OPTS"
+
+EXPOSE 8080
