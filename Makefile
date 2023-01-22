@@ -3,6 +3,7 @@
 .PHONY: build
 build: clean fmt
 	mvnd install
+	mvnd spotbugs:spotbugs
 	docker buildx build . -t catalog
 
 .PHONY: fmt
