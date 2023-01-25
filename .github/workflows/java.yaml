@@ -17,7 +17,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - name: setup mvnd
-      run: sdk install mvnd
+      run: curl -s "https://get.sdkman.io" | bash && sdk install mvnd
     - name: check formatting
       run: mvnd spotless:check
     - name: build
