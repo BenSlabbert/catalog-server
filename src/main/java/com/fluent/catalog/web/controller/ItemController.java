@@ -5,6 +5,7 @@ import com.fluent.catalog.web.dto.CreateItemDto;
 import com.fluent.catalog.web.dto.ItemDto;
 import com.fluent.catalog.web.dto.UpdateItemDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +40,10 @@ public class ItemController {
   @PostMapping("/{id}")
   public Mono<ItemDto> update(@PathVariable Long id, @RequestBody UpdateItemDto updateItemDto) {
     return itemService.update(id, updateItemDto);
+  }
+
+  @DeleteMapping("/{id}")
+  public Mono<Void> delete(@PathVariable Long id) {
+    return itemService.delete(id);
   }
 }

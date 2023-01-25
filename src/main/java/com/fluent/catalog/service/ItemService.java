@@ -44,4 +44,9 @@ public class ItemService {
         .switchIfEmpty(Mono.error(new NotFoundException("no item found for id: " + id)))
         .map(ITEM_MAPPER::toDto);
   }
+
+  public Mono<Void> delete(Long id) {
+    log.info("deleting: {}", id);
+    return itemRepo.deleteById(id);
+  }
 }
