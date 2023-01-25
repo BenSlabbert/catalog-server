@@ -17,7 +17,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - name: setup mvnd
-      run: curl https://downloads.apache.org/maven/mvnd/0.8.2/maven-mvnd-0.8.2-linux-amd64.zip -o maven-mvnd-0.8.2-linux-amd64.zip && unzip maven-mvnd-0.8.2-linux-amd64.zip && export PATH=$PATH:"$(pwd)/maven-mvnd-0.8.2-linux-amd64/bin" && mvnd --version
+      run: curl https://downloads.apache.org/maven/mvnd/0.8.2/maven-mvnd-0.8.2-linux-amd64.zip -o maven-mvnd-0.8.2-linux-amd64.zip && unzip maven-mvnd-0.8.2-linux-amd64.zip && mv maven-mvnd-0.8.2-linux-amd64/bin/mvnd /usr/local/bin/ && mvnd --version
     - name: check formatting
       run: mvnd spotless:check
     - name: build
