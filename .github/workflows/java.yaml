@@ -18,3 +18,7 @@ jobs:
         distribution: 'temurin'
     - name: build
       run: mvn install
+    - name: spotbugs
+      run: mvn spotbugs:spotbugs
+    - name: docker
+      run: docker buildx build . -t catalog
