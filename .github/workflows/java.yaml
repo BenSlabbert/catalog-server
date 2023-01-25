@@ -16,6 +16,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
+    - name: fmt check
+      run: mvn spotless:check
     - name: build
       run: mvn install
     - name: spotbugs
