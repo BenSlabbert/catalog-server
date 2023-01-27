@@ -99,7 +99,7 @@
                 <configFile>dbeaver.properties</configFile>
               </dbeaver>
               <includes>
-                <include>/**/src/main/resources/**/*.sql</include>
+                <include>**/*.sql</include>
               </includes>
             </sql>
             <pom>
