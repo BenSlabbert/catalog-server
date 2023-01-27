@@ -4,7 +4,8 @@
 build: clean fmt
 	mvnd install
 	mvnd spotbugs:spotbugs
-	docker buildx build . -t catalog
+	docker buildx build . -t catalog-base:latest
+	make -C item
 
 .PHONY: fmt
 fmt:
