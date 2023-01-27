@@ -16,11 +16,5 @@ jobs:
       with:
         java-version: '19'
         distribution: 'zulu'
-    - name: fmt check
-      run: mvn spotless:check
-    - name: build
-      run: mvn install
-    - name: spotbugs
-      run: mvn spotbugs:spotbugs
-    - name: docker
-      run: docker buildx build . -t catalog
+    - name: make
+      run: make
