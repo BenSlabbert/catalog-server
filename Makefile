@@ -1,16 +1,18 @@
 #!make
 
+M := "mvn"
+
 .PHONY: build
 build: clean fmt
-	mvnd install
-	mvnd spotbugs:spotbugs
+	${M} install
+	${M} spotbugs:spotbugs
 	docker buildx build . -t catalog-base:latest
 	make -C item
 
 .PHONY: fmt
 fmt:
-	mvnd spotless:apply
+	${M} spotless:apply
 
 .PHONY: clean
 clean:
-	mvnd clean
+	${M} clean
