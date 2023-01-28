@@ -1,20 +1,15 @@
-version: '3'
-
+---
+version: "3"
 services:
   postgres:
-    image: postgres:15-alpine
+    image: "postgres:15-alpine"
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: catalog
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "catalog"
     ports:
-      - "5432:5432"
-
-  catalog:
-      image: catalog:latest
-      environment:
-        APP_DB_HOST: "postgres:5432"
-      ports:
-        - "8080:8080"
-      depends_on:
-        - postgres
+    - "5432:5432"
+  redis:
+    image: "redis:7-alpine"
+    ports:
+    - "6379:6379"

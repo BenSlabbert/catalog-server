@@ -1,20 +1,21 @@
-name: Java + Maven + Docker
-
-on:
+---
+name: "Java + Maven + Docker"
+"on":
   push:
-    branches: [ "main" ]
+    branches:
+    - "main"
   pull_request:
-    branches: [ "main" ]
-
+    branches:
+    - "main"
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 19
-      uses: actions/setup-java@v3
+    - uses: "actions/checkout@v3"
+    - name: "Set up JDK 19"
+      uses: "actions/setup-java@v3"
       with:
-        java-version: '19'
-        distribution: 'zulu'
-    - name: make
-      run: make
+        java-version: "19"
+        distribution: "zulu"
+    - name: "make"
+      run: "make"
