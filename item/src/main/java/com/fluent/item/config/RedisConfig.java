@@ -1,16 +1,13 @@
 package com.fluent.item.config;
 
-import io.lettuce.core.RedisClient;
+import com.redis.lettucemod.RedisModulesClient;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
 import io.lettuce.core.RedisURI;
-import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.codec.StringCodec;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.support.AsyncConnectionPoolSupport;
 import io.lettuce.core.support.BoundedAsyncPool;
 import io.lettuce.core.support.BoundedPoolConfig;
-import io.lettuce.core.support.ConnectionPoolSupport;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,29 +20,16 @@ public class RedisConfig {
   }
 
   @Bean
-  RedisClient redisClient() {
-    return RedisClient.create();
+  RedisModulesClient redisClient() {
+    return RedisModulesClient.create();
   }
 
   @Bean
-  BoundedAsyncPool<StatefulRedisConnection<String, String>> boundedAsyncPool(
-      RedisClient redisClient, RedisURI redisURI) {
+  BoundedAsyncPool<StatefulRedisModulesConnection<String, String>> boundedAsyncPool(
+      RedisModulesClient redisClient, RedisURI redisURI) {
+
     return AsyncConnectionPoolSupport.createBoundedObjectPool(
-        () -> redisClient.connectAsync(StringCodec.UTF8, redisURI),
+        () -> CompletableFuture.supplyAsync(() -> redisClient.connect(StringCodec.UTF8, redisURI)),
         BoundedPoolConfig.builder().minIdle(1).maxIdle(1).maxTotal(1).build());
-  }
-
-  @Bean
-  GenericObjectPool<StatefulRedisPubSubConnection<String, String>> boundedAsyncPubSubPool(
-      RedisClient redisClient, RedisURI redisURI) {
-
-    GenericObjectPoolConfig<StatefulRedisPubSubConnection<String, String>> config =
-        new GenericObjectPoolConfig<>();
-    config.setMinIdle(1);
-    config.setMaxIdle(1);
-    config.setMaxTotal(1);
-
-    return ConnectionPoolSupport.createGenericObjectPool(
-        () -> redisClient.connectPubSub(StringCodec.UTF8, redisURI), config);
   }
 }

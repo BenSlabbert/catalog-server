@@ -22,6 +22,10 @@
       <artifactId>lettuce-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.redis</groupId>
+      <artifactId>lettucemod</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
     </dependency>

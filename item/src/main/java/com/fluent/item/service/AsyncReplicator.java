@@ -1,8 +1,8 @@
 package com.fluent.item.service;
 
 import com.fluent.item.web.dto.ItemDto;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import com.redis.lettucemod.api.async.RedisModulesAsyncCommands;
 import io.lettuce.core.support.BoundedAsyncPool;
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 @RequiredArgsConstructor
 public class AsyncReplicator {
 
-  private final BoundedAsyncPool<StatefulRedisConnection<String, String>> boundedAsyncPool;
+  private final BoundedAsyncPool<StatefulRedisModulesConnection<String, String>> boundedAsyncPool;
   private final ReactiveTransactionManager transactionManager;
   private final ItemService itemService;
 
@@ -30,7 +30,7 @@ public class AsyncReplicator {
     // find all items not yet replicated and replicate them
     itemService
         .findAllNotReplicated()
-        .buffer(5)
+        .buffer(128)
         .subscribe(dtos -> upsertMany(dtos).whenComplete(markAllAsReplicated(dtos)));
   }
 
@@ -80,13 +80,15 @@ public class AsyncReplicator {
         .thenCompose(
             conn -> {
               conn.setAutoFlushCommands(false);
-              RedisAsyncCommands<String, String> async = conn.async();
+              RedisModulesAsyncCommands<String, String> async = conn.async();
 
-              List<CompletableFuture<Long>> futures =
+              List<CompletableFuture<String>> futures =
                   values.stream()
                       .map(
                           value ->
-                              async.hset(itemKey(value.id()), value.asMap()).toCompletableFuture())
+                              async
+                                  .jsonSet(itemKey(value.id()), "$", value.json())
+                                  .toCompletableFuture())
                       .toList();
 
               conn.flushCommands();
@@ -107,9 +109,9 @@ public class AsyncReplicator {
         .thenCompose(
             conn ->
                 conn.async()
-                    .hset(itemKey(value.id()), value.asMap())
+                    .jsonSet(itemKey(value.id()), "$", value.json())
                     .whenComplete((s, t) -> boundedAsyncPool.release(conn)))
-        .thenAccept(l -> log.info("updated hsets: {}", l));
+        .thenAccept(l -> log.info("updated json: {}", l));
   }
 
   private String itemKey(long id) {
