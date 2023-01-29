@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisConfig {
 
+  public static final String ITEM_INDEX = "item_index";
+
   @Bean
   RedisURI redisURI() {
     return RedisURI.builder().withHost("localhost").withPort(6379).withDatabase(0).build();

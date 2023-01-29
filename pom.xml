@@ -23,7 +23,6 @@
     <spotless.version>2.31.0</spotless.version>
     <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
     <lombok.version>1.18.24</lombok.version>
-    <lettuce.version>6.2.2.RELEASE</lettuce.version>
     <lettucemod.version>3.2.1</lettucemod.version>
     <commons-pool2.version>2.11.1</commons-pool2.version>
 
@@ -48,11 +47,6 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-pool2</artifactId>
         <version>${commons-pool2.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.lettuce</groupId>
-        <artifactId>lettuce-core</artifactId>
-        <version>${lettuce.version}</version>
       </dependency>
       <dependency>
         <groupId>com.redis</groupId>

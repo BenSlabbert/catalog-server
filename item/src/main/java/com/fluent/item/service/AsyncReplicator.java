@@ -1,8 +1,11 @@
 package com.fluent.item.service;
 
+import com.fluent.item.config.RedisConfig;
 import com.fluent.item.web.dto.ItemDto;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
 import com.redis.lettucemod.api.async.RedisModulesAsyncCommands;
+import com.redis.lettucemod.search.CreateOptions;
+import com.redis.lettucemod.search.Field;
 import io.lettuce.core.support.BoundedAsyncPool;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +30,27 @@ public class AsyncReplicator {
 
   @EventListener
   public void startup(ApplicationReadyEvent e) {
+    // ensure we have an index
+    // todo fix this, not working
+    // https://redis.io/docs/stack/search/indexing_json/#create-index-with-json-schema
+    // FT.CREATE itemIdx ON JSON PREFIX 1 item: SCHEMA $.name AS name TEXT
+    // above works
+
+    boundedAsyncPool
+        .acquire()
+        .thenCompose(
+            conn ->
+                conn.async()
+                    .ftCreate(
+                        RedisConfig.ITEM_INDEX,
+                        CreateOptions.<String, String>builder()
+                            .on(CreateOptions.DataType.JSON)
+                            .prefixes("1", "item:")
+                            .build(),
+                        Field.numeric("$.id").as("id").build(),
+                        Field.text("$.name").as("name").withSuffixTrie().build())
+                    .whenComplete((s, t) -> boundedAsyncPool.release(conn)));
+
     // find all items not yet replicated and replicate them
     itemService
         .findAllNotReplicated()

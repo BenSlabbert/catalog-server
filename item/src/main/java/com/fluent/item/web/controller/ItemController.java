@@ -5,6 +5,7 @@ import com.fluent.item.service.ItemService;
 import com.fluent.item.web.dto.CreateItemDto;
 import com.fluent.item.web.dto.ItemDto;
 import com.fluent.item.web.dto.UpdateItemDto;
+import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,6 +33,16 @@ public class ItemController {
   @GetMapping("/all")
   public Flux<ItemDto> findAll() {
     return itemService.findAll();
+  }
+
+  @GetMapping("/search")
+  public Mono<List<ItemDto>> search(
+      @RequestParam("s") String term,
+      @RequestParam(value = "limit", required = false, defaultValue = "10") long limit) {
+    if (term.length() < 2) {
+      return Mono.error(new IllegalAccessException("search term must longer than 2 chars"));
+    }
+    return itemService.search(term, limit);
   }
 
   @GetMapping("/{id}")

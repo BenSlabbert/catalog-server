@@ -1,5 +1,6 @@
 package com.fluent.item.service;
 
+import com.fluent.item.config.RedisConfig;
 import com.fluent.item.dao.entiy.Item;
 import com.fluent.item.dao.repo.ItemRepo;
 import com.fluent.item.mapper.ItemMapper;
@@ -7,7 +8,14 @@ import com.fluent.item.web.dto.CreateItemDto;
 import com.fluent.item.web.dto.ItemDto;
 import com.fluent.item.web.dto.UpdateItemDto;
 import com.fluent.item.web.exception.NotFoundException;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import com.redis.lettucemod.search.Limit;
+import com.redis.lettucemod.search.SearchOptions;
+import io.lettuce.core.support.BoundedAsyncPool;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +31,7 @@ public class ItemService {
 
   private static final ItemMapper ITEM_MAPPER = ItemMapper.INSTANCE;
 
+  private final BoundedAsyncPool<StatefulRedisModulesConnection<String, String>> boundedAsyncPool;
   private final ItemRepo itemRepo;
 
   public Flux<ItemDto> findAll() {
@@ -68,5 +77,34 @@ public class ItemService {
   public Mono<Void> delete(Long id) {
     log.info("deleting: {}", id);
     return itemRepo.deleteById(id);
+  }
+
+  public Mono<List<ItemDto>> search(String term, long limit) {
+    var future =
+        boundedAsyncPool
+            .acquire()
+            .thenCompose(
+                conn ->
+                    conn.async()
+                        .ftSearch(
+                            RedisConfig.ITEM_INDEX,
+                            "@name:(*" + term + "*)",
+                            SearchOptions.<String, String>builder()
+                                .returnFields("id", "name")
+                                .limit(Limit.offset(0L).num(limit))
+                                .build())
+                        .whenComplete((s, t) -> boundedAsyncPool.release(conn)))
+            .thenApply(
+                results ->
+                    results.stream()
+                        .map(
+                            e ->
+                                e.entrySet().stream()
+                                    .collect(
+                                        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                        .map(ItemDto::fromSearch)
+                        .toList());
+
+    return Mono.fromFuture(future);
   }
 }
