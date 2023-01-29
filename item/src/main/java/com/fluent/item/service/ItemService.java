@@ -7,6 +7,7 @@ import com.fluent.item.web.dto.CreateItemDto;
 import com.fluent.item.web.dto.ItemDto;
 import com.fluent.item.web.dto.UpdateItemDto;
 import com.fluent.item.web.exception.NotFoundException;
+import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,18 @@ public class ItemService {
         .map(ITEM_MAPPER::toDto);
   }
 
+  public Flux<ItemDto> findAllNotReplicated() {
+    return itemRepo.findAllNotReplicated().map(ITEM_MAPPER::toDto);
+  }
+
   public Mono<Void> markAsReplicated(Long id) {
-    log.info("marking as deleted: {}", id);
+    log.info("marking as replicated: {}", id);
     return itemRepo.markAsReplicated(id);
+  }
+
+  public Mono<Void> markAllAsReplicated(Collection<Long> ids) {
+    log.info("marking as replicated: {}", ids);
+    return itemRepo.markAllAsReplicated(ids);
   }
 
   public Mono<Void> markAsDeleted(Long id) {
