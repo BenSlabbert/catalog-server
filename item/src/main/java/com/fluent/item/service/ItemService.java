@@ -45,6 +45,16 @@ public class ItemService {
         .map(ITEM_MAPPER::toDto);
   }
 
+  public Mono<Void> markAsReplicated(Long id) {
+    log.info("marking as deleted: {}", id);
+    return itemRepo.markAsReplicated(id);
+  }
+
+  public Mono<Void> markAsDeleted(Long id) {
+    log.info("marking as deleted: {}", id);
+    return itemRepo.markAsDeleted(id);
+  }
+
   public Mono<Void> delete(Long id) {
     log.info("deleting: {}", id);
     return itemRepo.deleteById(id);

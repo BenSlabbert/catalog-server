@@ -24,6 +24,7 @@ public class EventSubscriber {
     channelMessageFlux = reactive.observeChannels();
   }
 
+  // leave as example for now...
   public Flux<ChannelMessage<String, String>> getFlux() {
     return channelMessageFlux;
   }

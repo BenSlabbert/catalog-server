@@ -2,12 +2,11 @@ package com.fluent.item.dao.entiy;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class Item {
-
-  @Id private Long id;
+@EqualsAndHashCode(callSuper = true)
+public class Item extends Base {
 
   private String name;
 

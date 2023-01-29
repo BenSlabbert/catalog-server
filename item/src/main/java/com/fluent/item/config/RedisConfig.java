@@ -31,15 +31,21 @@ public class RedisConfig {
   BoundedAsyncPool<StatefulRedisConnection<String, String>> boundedAsyncPool(
       RedisClient redisClient, RedisURI redisURI) {
     return AsyncConnectionPoolSupport.createBoundedObjectPool(
-        () -> redisClient.connectAsync(StringCodec.UTF8, redisURI), BoundedPoolConfig.create());
+        () -> redisClient.connectAsync(StringCodec.UTF8, redisURI),
+        BoundedPoolConfig.builder().minIdle(1).maxIdle(1).maxTotal(1).build());
   }
 
   @Bean
   GenericObjectPool<StatefulRedisPubSubConnection<String, String>> boundedAsyncPubSubPool(
       RedisClient redisClient, RedisURI redisURI) {
 
+    GenericObjectPoolConfig<StatefulRedisPubSubConnection<String, String>> config =
+        new GenericObjectPoolConfig<>();
+    config.setMinIdle(1);
+    config.setMaxIdle(1);
+    config.setMaxTotal(1);
+
     return ConnectionPoolSupport.createGenericObjectPool(
-        () -> redisClient.connectPubSub(StringCodec.UTF8, redisURI),
-        new GenericObjectPoolConfig<>());
+        () -> redisClient.connectPubSub(StringCodec.UTF8, redisURI), config);
   }
 }

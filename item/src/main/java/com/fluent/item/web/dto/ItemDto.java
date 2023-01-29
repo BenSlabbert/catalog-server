@@ -1,3 +1,10 @@
 package com.fluent.item.web.dto;
 
-public record ItemDto(Long id, String name) {}
+import java.util.Map;
+
+public record ItemDto(Long id, String name) {
+
+  public Map<String, String> asMap() {
+    return Map.of("id", Long.toString(id), "name", name);
+  }
+}

@@ -2,10 +2,12 @@ CREATE
 	TABLE
 		item(
 			id serial,
-			name text
+			name text,
+			replicated BOOLEAN DEFAULT FALSE,
+			deleted BOOLEAN DEFAULT FALSE
 		);
 
 INSERT
 	INTO
 		item(name)
-	VALUES('name');
+	VALUES('seeded item');
