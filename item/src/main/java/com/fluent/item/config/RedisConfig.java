@@ -17,8 +17,12 @@ public class RedisConfig {
   public static final String ITEM_INDEX = "item_index";
 
   @Bean
-  RedisURI redisURI() {
-    return RedisURI.builder().withHost("localhost").withPort(6379).withDatabase(0).build();
+  RedisURI redisURI(RedisConfigProperties redisConfigProperties) {
+    return RedisURI.builder()
+        .withHost(redisConfigProperties.getHost())
+        .withPort(redisConfigProperties.getPort())
+        .withDatabase(redisConfigProperties.getDb())
+        .build();
   }
 
   @Bean

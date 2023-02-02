@@ -17,3 +17,7 @@ spring:
     locations:
     - "classpath:db/migration"
     validate-migration-naming: true
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
