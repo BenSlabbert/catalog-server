@@ -2,6 +2,10 @@
 app:
   db:
     host: "localhost:5432"
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
 spring:
   jpa:
     open-in-view: false
@@ -18,6 +22,6 @@ spring:
     - "classpath:db/migration"
     validate-migration-naming: true
 redis:
-  host: "localhost"
-  port: 6379
-  db: 0
+  host: "${app.redis.host}"
+  port: "${app.redis.port}"
+  db: "${app.redis.db}"
