@@ -36,6 +36,7 @@ public class RedisConfig {
 
     return AsyncConnectionPoolSupport.createBoundedObjectPool(
         () -> CompletableFuture.supplyAsync(() -> redisClient.connect(StringCodec.UTF8, redisURI)),
-        BoundedPoolConfig.builder().minIdle(1).maxIdle(1).maxTotal(1).build());
+        BoundedPoolConfig.create(),
+        false);
   }
 }

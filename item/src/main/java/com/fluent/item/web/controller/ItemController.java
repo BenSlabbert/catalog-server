@@ -6,9 +6,9 @@ import com.fluent.item.web.dto.CreateItemDto;
 import com.fluent.item.web.dto.ItemDto;
 import com.fluent.item.web.dto.UpdateItemDto;
 import java.util.List;
-import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,9 +26,9 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ItemController {
 
-  private final ItemService itemService;
+  private final ThreadPoolTaskExecutor executor;
   private final AsyncReplicator publisher;
-  private final Executor executor;
+  private final ItemService itemService;
 
   @GetMapping("/all")
   public Flux<ItemDto> findAll() {
@@ -54,17 +54,14 @@ public class ItemController {
   public Mono<ItemDto> create(@RequestBody CreateItemDto createItemDto) {
     return itemService
         .create(createItemDto)
-        .doOnSuccess(dto -> executor.execute(() -> publisher.replicate(dto)));
+        .doOnSuccess(dto -> executor.submit(() -> publisher.replicate(dto)));
   }
 
   @PostMapping("/{id}")
   public Mono<ItemDto> update(@PathVariable Long id, @RequestBody UpdateItemDto updateItemDto) {
-    // do the publish in another thread
-    // mark "synced" items
-    // start up job to process the rest with a redis lock so its not done by others as well
     return itemService
         .update(id, updateItemDto)
-        .doOnSuccess(dto -> executor.execute(() -> publisher.replicate(dto)));
+        .doOnSuccess(dto -> executor.submit(() -> publisher.replicate(dto)));
   }
 
   @DeleteMapping("/{id}")

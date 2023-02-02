@@ -16,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.ReactiveTransactionManager;
-import org.springframework.transaction.reactive.TransactionalOperator;
 
 @Slf4j
 @Service
@@ -25,16 +23,12 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 public class AsyncReplicator {
 
   private final BoundedAsyncPool<StatefulRedisModulesConnection<String, String>> boundedAsyncPool;
-  private final ReactiveTransactionManager transactionManager;
   private final ItemService itemService;
 
   @EventListener
   public void startup(ApplicationReadyEvent e) {
-    // ensure we have an index
-    // todo fix this, not working
     // https://redis.io/docs/stack/search/indexing_json/#create-index-with-json-schema
     // FT.CREATE itemIdx ON JSON PREFIX 1 item: SCHEMA $.name AS name TEXT
-    // above works
 
     boundedAsyncPool
         .acquire()
@@ -59,10 +53,12 @@ public class AsyncReplicator {
   }
 
   public void replicate(ItemDto dto) {
+    log.info("replicating: {}", dto);
     upsert(dto).whenComplete(markAsReplicated(dto));
   }
 
   public void delete(Long id) {
+    log.info("delete: {}", id);
     boundedAsyncPool
         .acquire()
         .thenCompose(
@@ -73,8 +69,7 @@ public class AsyncReplicator {
         .whenComplete(
             (s, t) -> {
               if (t == null) {
-                TransactionalOperator rxtx = TransactionalOperator.create(transactionManager);
-                itemService.delete(id).as(rxtx::transactional).subscribe();
+                itemService.delete(id).subscribe();
               }
             });
   }
@@ -82,8 +77,7 @@ public class AsyncReplicator {
   private BiConsumer<Void, Throwable> markAsReplicated(ItemDto itemDto) {
     return (v, t) -> {
       if (t == null) {
-        TransactionalOperator rxtx = TransactionalOperator.create(transactionManager);
-        itemService.markAsReplicated(itemDto.id()).as(rxtx::transactional).subscribe();
+        itemService.markAsReplicated(itemDto.id()).subscribe();
       }
     };
   }
@@ -92,8 +86,7 @@ public class AsyncReplicator {
     return (v, t) -> {
       if (t == null) {
         List<Long> ids = dtos.stream().map(ItemDto::id).toList();
-        TransactionalOperator rxtx = TransactionalOperator.create(transactionManager);
-        itemService.markAllAsReplicated(ids).as(rxtx::transactional).subscribe();
+        itemService.markAllAsReplicated(ids).subscribe();
       }
     };
   }

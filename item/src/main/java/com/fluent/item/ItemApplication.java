@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
@@ -18,8 +19,9 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableTransactionManagement
 public class ItemApplication {
 
-  private final RedisModulesClient redisClient;
   private final BoundedAsyncPool<StatefulRedisModulesConnection<String, String>> boundedAsyncPool;
+  private final ThreadPoolTaskExecutor executor;
+  private final RedisModulesClient redisClient;
 
   public static void main(String[] args) {
     SpringApplication.run(ItemApplication.class, args);
@@ -27,6 +29,8 @@ public class ItemApplication {
 
   @PreDestroy
   void destroy() {
+    log.info("shutting down executor");
+    executor.shutdown();
     log.info("shutting down redis 1/2");
     boundedAsyncPool.close();
     log.info("shutting down redis 2/2");

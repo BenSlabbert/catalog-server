@@ -5,8 +5,11 @@ services:
     image: "item:latest"
     environment:
       APP_DB_HOST: "postgres:5432"
+      APP_REDIS_HOST: "redisearch"
+      APP_REDIS_PORT: 6379
+      APP_REDIS_DB: 0
     ports:
     - "8080:8080"
     depends_on:
     - "postgres"
-    - "redis"
+    - "redisearch"
