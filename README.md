@@ -19,3 +19,4 @@ od -t x -An /dev/random | \
   tee results.bin | \
   vegeta report
 ```
+

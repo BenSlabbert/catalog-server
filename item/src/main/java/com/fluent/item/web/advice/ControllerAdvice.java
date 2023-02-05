@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ControllerAdvice {
 
   @ExceptionHandler
+  public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(e.getMessage()));
+  }
+
+  @ExceptionHandler
   public ResponseEntity<ErrorDto> handleNotFoundException(NotFoundException e) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDto(e.getMessage()));
   }

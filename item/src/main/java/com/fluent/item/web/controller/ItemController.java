@@ -39,9 +39,15 @@ public class ItemController {
   public Mono<List<ItemDto>> search(
       @RequestParam("s") String term,
       @RequestParam(value = "limit", required = false, defaultValue = "10") long limit) {
+
     if (term.length() < 2) {
-      return Mono.error(new IllegalAccessException("search term must longer than 2 chars"));
+      return Mono.error(new IllegalArgumentException("search term must longer than 2 chars"));
     }
+
+    if (term.contains(" ")) {
+      return Mono.error(new IllegalArgumentException("search term may not contain whitespaces"));
+    }
+
     return itemService.search(term, limit);
   }
 

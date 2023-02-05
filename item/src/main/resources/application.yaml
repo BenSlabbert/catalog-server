@@ -16,13 +16,13 @@ spring:
     execution:
       thread-name-prefix: "task-pool-"
       pool:
-        core-size: 2
-        max-size: 4
+        core-size: 1
+        max-size: 1
         queue-capacity: 1000
         keep-alive: "10s"
         allow-core-thread-timeout: true
   webflux:
-    base-path: "/context"
+    base-path: "/"
   jpa:
     open-in-view: false
   r2dbc:
