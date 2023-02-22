@@ -1,11 +1,12 @@
 package com.fluent.item.service;
 
 import com.fluent.item.config.RedisConfig;
-import com.fluent.item.dao.entiy.Item;
+import com.fluent.item.dao.entity.Item;
 import com.fluent.item.dao.repo.ItemRepo;
 import com.fluent.item.mapper.ItemMapper;
 import com.fluent.item.web.dto.CreateItemDto;
 import com.fluent.item.web.dto.ItemDto;
+import com.fluent.item.web.dto.ItemDtoJsonWriter;
 import com.fluent.item.web.dto.UpdateItemDto;
 import com.fluent.item.web.exception.NotFoundException;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
@@ -90,7 +91,7 @@ public class ItemService {
                             RedisConfig.ITEM_INDEX,
                             "@name:(*" + term + "*)",
                             SearchOptions.<String, String>builder()
-                                .returnFields("id", "name")
+                                .returnFields(ItemDtoJsonWriter.ID, ItemDtoJsonWriter.NAME)
                                 .limit(Limit.offset(0L).num(limit))
                                 .build())
                         .whenComplete((s, t) -> boundedAsyncPool.release(conn)))
@@ -102,7 +103,7 @@ public class ItemService {
                                 e.entrySet().stream()
                                     .collect(
                                         Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-                        .map(ItemDto::fromSearch)
+                        .map(ItemDtoJsonWriter::fromMap)
                         .toList());
 
     return Mono.fromFuture(future);

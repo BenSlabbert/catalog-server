@@ -17,5 +17,7 @@ jobs:
       with:
         java-version: "19"
         distribution: "zulu"
+    - name: "git"
+      run: "git --version"
     - name: "make"
       run: "make"

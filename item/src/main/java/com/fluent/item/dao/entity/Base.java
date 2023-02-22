@@ -1,4 +1,4 @@
-package com.fluent.item.dao.entiy;
+package com.fluent.item.dao.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

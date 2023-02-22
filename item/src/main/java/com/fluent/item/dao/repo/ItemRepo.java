@@ -1,6 +1,6 @@
 package com.fluent.item.dao.repo;
 
-import com.fluent.item.dao.entiy.Item;
+import com.fluent.item.dao.entity.Item;
 import java.util.Collection;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

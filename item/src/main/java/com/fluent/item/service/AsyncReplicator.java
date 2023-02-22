@@ -2,6 +2,7 @@ package com.fluent.item.service;
 
 import com.fluent.item.config.RedisConfig;
 import com.fluent.item.web.dto.ItemDto;
+import com.fluent.item.web.dto.ItemDtoJsonWriter;
 import com.redis.lettucemod.api.StatefulRedisModulesConnection;
 import com.redis.lettucemod.api.async.RedisModulesAsyncCommands;
 import com.redis.lettucemod.search.CreateOptions;
@@ -41,8 +42,11 @@ public class AsyncReplicator {
                             .on(CreateOptions.DataType.JSON)
                             .prefixes("1", "item:")
                             .build(),
-                        Field.numeric("$.id").as("id").build(),
-                        Field.text("$.name").as("name").withSuffixTrie().build())
+                        Field.numeric("$." + ItemDtoJsonWriter.ID).as(ItemDtoJsonWriter.ID).build(),
+                        Field.text("$." + ItemDtoJsonWriter.NAME)
+                            .as(ItemDtoJsonWriter.NAME)
+                            .withSuffixTrie()
+                            .build())
                     .whenComplete((s, t) -> boundedAsyncPool.release(conn)));
 
     // find all items not yet replicated and replicate them
@@ -104,7 +108,10 @@ public class AsyncReplicator {
                       .map(
                           value ->
                               async
-                                  .jsonSet(itemKey(value.id()), "$", value.json())
+                                  .jsonSet(
+                                      itemKey(value.id()),
+                                      "$",
+                                      ItemDtoJsonWriter.toJsonString(value))
                                   .toCompletableFuture())
                       .toList();
 
@@ -126,7 +133,7 @@ public class AsyncReplicator {
         .thenCompose(
             conn ->
                 conn.async()
-                    .jsonSet(itemKey(value.id()), "$", value.json())
+                    .jsonSet(itemKey(value.id()), "$", ItemDtoJsonWriter.toJsonString(value))
                     .whenComplete((s, t) -> boundedAsyncPool.release(conn)))
         .thenAccept(l -> log.info("updated json: {}", l));
   }

@@ -26,6 +26,7 @@
     <lettucemod.version>3.2.1</lettucemod.version>
     <commons-pool2.version>2.11.1</commons-pool2.version>
     <spring-boot-configuration-processor.version>3.0.2</spring-boot-configuration-processor.version>
+    <processor.version>1.0-SNAPSHOT</processor.version>
 
     <!--plugins-->
     <spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
@@ -33,6 +34,7 @@
     <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+    <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -60,6 +62,11 @@
         <version>${org.mapstruct.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.example.processor</groupId>
+        <artifactId>processor</artifactId>
+        <version>${processor.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-configuration-processor</artifactId>
         <version>${spring-boot-configuration-processor.version}</version>
@@ -80,6 +87,8 @@
             <target>${java.version}</target>
             <compilerArgs>
               <arg>-parameters</arg>
+              <!--configuration for the processor-->
+              <arg>-Apackage=com.fluent.item.web.dto</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -97,6 +106,11 @@
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${org.mapstruct.version}</version>
               </path>
+              <path>
+                <groupId>org.example.processor</groupId>
+                <artifactId>processor</artifactId>
+                <version>${processor.version}</version>
+              </path>
             </annotationProcessorPaths>
           </configuration>
         </plugin>
@@ -106,7 +120,9 @@
           <version>${maven-jar-plugin.version}</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
+          <version>${maven-dependency-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
